@@ -1,5 +1,6 @@
 body {
-    background-color: green;
+    background-color: black;
+    font-family: arial;
 }
 
 .blue {
@@ -8,4 +9,28 @@ body {
 
 .green {
     background-color: green;
+}
+
+.card {
+    padding-top: 5px;
+    background-color: #F5F5F5;
+    border-style: solid;
+    border-color: #666666;
+    border-width: 1px;
+    border-radius: 1px;
+}
+
+.card-images {
+}
+.card-img {
+    border-style: solid;
+    border-color: #616161;
+    border-radius: 1px;
+}
+
+.card-content {
+
+}
+
+.header {
 }
