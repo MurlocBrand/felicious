@@ -29,6 +29,31 @@ function update(){
     loadRSS("http://www.felicious.se/RSS/blog", function(xmlDoc){
         var feed = parseXML(xmlDoc);
         console.log(feed);
+        var blog = feed.rss.channel.item;
+        // le hax, we insert all the posts before the sentinel
+        var sentinel = document.getElementById("ggsentinel");
+        var container = document.getElementById("container");
+
+        blog.forEach(function(entry) {
+            // create the class attributes
+            var cardClass = document.createAttribute("class");
+            cardClass.nodeValue = "mobile-prefix-5 mobile-grid-90 mobile-suffix-5 prefix-5 grid-90 card";
+            var contentClass = document.createAttribute("class");
+            contentClass.nodeValue = "mobile-prefix-5 mobile-grid-90 prefix-5 grid-90 card-content";
+
+            var card = document.createElement("div");
+            var content = document.createElement("div");
+            var title = document.createElement("h1");
+
+            title.appendChild(document.createTextNode(entry.title.toString()));
+            content.innerHTML = entry.encoded.__cdata;
+            content.setAttributeNode(contentClass);
+
+            card.appendChild(title)
+            card.appendChild(content);
+            card.setAttributeNode(cardClass);
+            container.insertBefore(card, sentinel);
+        });
     });
     //console.log(rss);
 }
