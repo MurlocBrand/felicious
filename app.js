@@ -40,22 +40,45 @@ function update(){
             cardClass.nodeValue = "mobile-prefix-5 mobile-grid-90 mobile-suffix-5 prefix-5 grid-90 card";
             var contentClass = document.createAttribute("class");
             contentClass.nodeValue = "mobile-prefix-5 mobile-grid-90 prefix-5 grid-90 card-content";
+            var imgClass = document.createAttribute("class");
+            imgClass.nodeValue = "mobile-prefix-5 mobile-grid-90 prefix-5 grid-90 card-img visible-img";
+
 
             var card = document.createElement("div");
             var content = document.createElement("div");
             var title = document.createElement("h1");
+            var images = document.createElement("div");
 
             title.appendChild(document.createTextNode(entry.title.toString()));
-            content.innerHTML = entry.encoded.__cdata;
+            // attempt to split on the image tag
+            var data = entry.encoded.__cdata.split("<img");
+            var imgSrc, image, srcAtt;
+            // if we have an image
+            if (data[1]) {
+                // extract the src attribute
+                imgSrc = data[1].split(" ")[1];
+                // remove the preceding src=", and the last "
+                imgSrc = imgSrc.substr(5, imgSrc.length-6)
+
+                srcAtt = document.createAttribute("src");
+                srcAtt.nodeValue = imgSrc;
+                image = document.createElement("img");
+                image.setAttributeNode(imgClass);
+                image.setAttributeNode(srcAtt);
+            }
+            // set the text of the blogpost
+            content.innerHTML = data[0];
             content.setAttributeNode(contentClass);
 
             card.appendChild(title)
+            if (image) {
+                card.appendChild(image);
+            }
             card.appendChild(content);
             card.setAttributeNode(cardClass);
             container.insertBefore(card, sentinel);
         });
     });
-    //console.log(rss);
 }
 
 document.onload = update();
