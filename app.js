@@ -6,26 +6,17 @@ function parseXML(xmlText) {
 }
 
 function loadRSS(url, callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", "https://script.google.com/a/macros/mcpher.com/s/AKfycbzGgpLEWS0rKSBqXG5PcvJ7Fpe02fvGqiCqq54SVQmBJSpy_6s/exec?url=" + encodeURIComponent(url), true);
-    xhr.responseType = 'json';
-
-    xhr.onload = function() {
-        //var parser = new DOMParser();
-        //var doc = parser.parseFromString(xhr.response.results, "text/xml");
-
-        callback(xhr.response.results);
-    };
-
-    xhr.onerror = function() {
-        alert('Woops, there was an error making the request.');
-    };
-
-    xhr.send();
-
+    var jqxhr = $.get( "https://script.google.com/a/macros/mcpher.com/s/AKfycbzGgpLEWS0rKSBqXG5PcvJ7Fpe02fvGqiCqq54SVQmBJSpy_6s/exec?url=" + encodeURIComponent(url), function(data) {
+        alert( "success" );
+        callback(data.results);
+    })
+    .fail(function() {
+        alert( "error" );
+    })
 }
 
 function update(){
+    console.log("running update");
     loadRSS("http://www.felicious.se/RSS/blog", function(xmlDoc){
         var feed = parseXML(xmlDoc);
         console.log(feed);
@@ -81,4 +72,6 @@ function update(){
     });
 }
 
-document.onload = update();
+$(document).ready(function(){
+    update();
+});
