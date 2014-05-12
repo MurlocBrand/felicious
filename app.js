@@ -1,18 +1,19 @@
-var x2js = new X2JS();
 var fullText = [];
 var postId = 0;
-
-function parseXML(xmlText) {
-    return x2js.xml_str2json( xmlText ); 
-}
+var postFetchCount = 20;
 
 function loadRSS(url, callback) {
-    var jqxhr = $.get( "https://script.google.com/a/macros/mcpher.com/s/AKfycbzGgpLEWS0rKSBqXG5PcvJ7Fpe02fvGqiCqq54SVQmBJSpy_6s/exec?url=" + encodeURIComponent(url), function(data) {
-        callback(data.results);
-    })
-    .fail(function() {
-        alert( "error - couldn't get blog data. Make sure you have a working internet connection and restart the app." );
-    })
+    $.jGFeed(url,
+        function(feeds){
+            // Check for errors
+            if(!feeds){
+                // there was an error
+                return false;
+            }
+
+            callback(feeds);
+        }, 
+    postFetchCount);
 }
 
 function showText(id){
@@ -21,16 +22,20 @@ function showText(id){
 }
 
 function renderBlogItems (container, blog) {
-    blog.forEach(function(entry) {
+    for (var i = 0; i < blog.length; i++) {
+        var entry = blog[i];
+
+        console.log(entry);
+
         var card = $("<div>").addClass("card");
         var title = $("<h1>");
         var content = $("<p>");
         var body = $("<div>").addClass("body1");
 
-        title.html(entry.title.__cdata);
+        title.html(entry.title);
 
         // attempt to split on the image tag
-        var data = entry.encoded.__cdata.split("<img");
+        var data = entry.content.split("<img");
         var imgSrc, image, srcAtt;
 
         // if we have an image
@@ -56,7 +61,7 @@ function renderBlogItems (container, blog) {
 
         body.append(content);
         card.append(body);
-        if (data[0].length > 4 * 35) {
+        if (entry.contentSnippet) {
             var overlay = $("<div>");
             overlay.attr("id", "overlay-" + postId);
             overlay.addClass("image-overlay");
@@ -73,37 +78,34 @@ function renderBlogItems (container, blog) {
 
             fullText[postId] = data[0];
 
-            content.html(data[0].substr(0, data[0].indexOf(" ", 120)));
+            content.html(entry.contentSnippet);
             body.append(overlay);
         }
         container.append(card);
 
         postId++;
-    });
+    }
 }
 
 function update(){
-    loadRSS("http://www.felicious.se/RSS/blog", function(xmlDoc){
-        var feed = parseXML(xmlDoc);
-        var blog = feed.rss.channel.item;
+    loadRSS("http://www.felicious.se/RSS/blog", function(feed){
         var currentItems = $.totalStorage('cached-blog');
-
-        $.totalStorage('cached-blog', blog);
+        $.totalStorage('cached-blog', feed.entries);
         
         if (currentItems) {
             for (var i = 0; i < currentItems.length; i++) {
-                blog.pop();    
+                feed.entries.pop();    
             }
         }
         
-        renderBlogItems($("#new-items-node"), blog);
+        renderBlogItems($("#new-items-node"), feed.entries);
     });
 }
 
 $(document).ready(function(){
-
-    if ($.totalStorage('cached-blog'))
+    if ($.totalStorage('cached-blog')) {
         renderBlogItems($("#cached-items-node"), $.totalStorage('cached-blog'));
+    }
     
     update();
 });
