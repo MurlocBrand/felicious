@@ -9,8 +9,7 @@ future updates
 
 acknowledgements
 ================
-- jQuery by XYZ
-- jGFeed by XYZ
+- jQuery by jQuery Foundation, Inc
 - totalStorage by XYZ
 
 copyright
