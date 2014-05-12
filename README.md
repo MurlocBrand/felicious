@@ -9,8 +9,9 @@ future updates
 
 acknowledgements
 ================
-- jQuery by jQuery Foundation, Inc
-- totalStorage by XYZ
+- jQuery by jQuery Foundation
+- totalStorage by Jared Novack & Upstatement
+- Google Feed API, Google
 
 copyright
 =========
