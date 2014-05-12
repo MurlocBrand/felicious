@@ -3,17 +3,12 @@ var postId = 0;
 var postFetchCount = 20;
 
 function loadRSS(url, callback) {
-    $.jGFeed(url,
-        function(feeds){
-            // Check for errors
-            if(!feeds){
-                // there was an error
-                return false;
-            }
-
-            callback(feeds);
-        }, 
-    postFetchCount);
+    var gurl="http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&callback=?&q="+url+"&num=" + postFetchCount;
+    
+    $.getJSON(gurl, function(data) {
+        if (! data.responseData.feed) return false;
+        callback(data.responseData.feed)
+    });
 }
 
 function showText(id){
