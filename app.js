@@ -6,8 +6,11 @@ function loadRSS(url, callback) {
     var gurl="http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&callback=?&q="+url+"&num=" + postFetchCount;
     
     $.getJSON(gurl, function(data) {
-        if (! data.responseData.feed) return false;
-        callback(data.responseData.feed)
+        if (! data.responseData.feed) {
+            alert("Error - Could not retrieve new blog posts. Please check internet connection and try again!");
+        } else {
+            callback(data.responseData.feed)
+        }
     });
 }
 
