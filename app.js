@@ -2,6 +2,9 @@ var fullText = [];
 var postId = 0;
 var postFetchCount = 20;
 
+/* Request a RSS feed via Google's Feed API. 
+ * Feed API the RSS feed as a JSON object. 
+ */
 function loadRSS(url, callback) {
     var gurl="http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&callback=?&q="+url+"&num=" + postFetchCount;
     
@@ -14,16 +17,20 @@ function loadRSS(url, callback) {
     });
 }
 
+/* Show full text of a given post. 
+ * Only IDs belonging to a post with a snippet can be used. 
+ */
 function showText(id){
     $("#text-" + id).html(fullText[id]);
     $("#overlay-" + id).hide();
 }
 
+/* Append a number of blog posts (items) to a given
+ * jquery document node. 
+ */
 function renderBlogItems (container, blog) {
     for (var i = 0; i < blog.length; i++) {
         var entry = blog[i];
-
-        console.log(entry);
 
         var card = $("<div>").addClass("card");
         var title = $("<h1>");
@@ -59,6 +66,8 @@ function renderBlogItems (container, blog) {
 
         body.append(content);
         card.append(body);
+        
+        // If we have a short version (snippet) of the full text, use it!
         if (entry.contentSnippet) {
             var overlay = $("<div>");
             overlay.attr("id", "overlay-" + postId);
@@ -85,6 +94,9 @@ function renderBlogItems (container, blog) {
     }
 }
 
+/* Load new blog posts. This method should avoid
+ * adding already existing blog posts, not 100% sure.
+ */
 function update(){
     loadRSS("http://www.felicious.se/RSS/blog", function(feed){
         var currentItems = $.totalStorage('cached-blog');
@@ -100,6 +112,7 @@ function update(){
     });
 }
 
+/* Render cached blog posts immediately, and fetch new ones. */
 $(document).ready(function(){
     if ($.totalStorage('cached-blog')) {
         renderBlogItems($("#cached-items-node"), $.totalStorage('cached-blog'));
