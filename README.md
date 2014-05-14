@@ -11,7 +11,7 @@ acknowledgements
 ================
 - jQuery by jQuery Foundation
 - totalStorage by Jared Novack & Upstatement
-- Google Feed API, Google
+- Google Feed API by Google
 
 copyright
 =========
