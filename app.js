@@ -8,7 +8,8 @@ var fullText = [],
     canUpdate = true,
     inView = true,
     $window = $(window),
-    $scroller;
+    $scroller,
+    currentItems = [];
 
 /* Test if scroll element is inside view or not. */
 function insideView() {
@@ -172,6 +173,7 @@ function renderBlogItems (container, blog) {
             body.append(createOverlay(postId));
         }
 
+        currentItems.push(entry);
         container.append(card);
         postId++;
     }
@@ -189,7 +191,6 @@ function update(num){
     if (num) postFetchCount += num;
 
     loadRSS("http://www.felicious.se/RSS/blog", function(feed){
-        var currentItems = $.totalStorage('cached-blog');
         $.totalStorage('cached-blog', feed.entries);
 
         if (currentItems) {
