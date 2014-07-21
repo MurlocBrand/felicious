@@ -49,8 +49,11 @@ function parseDate(value) {
  * natural ordering. 0 if equal, 1 if later, -1 if earlier
  */
 function compareDates(date1, date2) {
-    date1 = parseDate(date1.substr(5, 20));
-    date2 = parseDate(date2.substr(5, 20));
+    if (typeof date1 == "string")
+        date1 = parseDate(date1.substr(5, 20));
+
+    if (typeof date2 == "string")
+        date2 = parseDate(date2.substr(5, 20));
 
     // compare amount of seconds that differ the two times
     var time1 = date1.sec + date1.min * 60 + date1.hour * 3600
@@ -61,7 +64,11 @@ function compareDates(date1, date2) {
                 + date2.day * 24 * 3600 + date2.month * 30.5 * 24 * 3600
                 + date2.year * 12 * 30.5 * 24 * 3600;
 
-    return time1 - time2;
+    var diff = time1 - time2;
+
+    if (diff < 0) return -1;
+    else if (diff > 0) return 1;
+    else return 0;
 }
 
 /* Show full text of a given post. 
@@ -169,16 +176,39 @@ function update(){
     loadRSS("http://www.felicious.se/RSS/blog", function(feed){
         var currentItems = $.totalStorage('cached-blog');
         $.totalStorage('cached-blog', feed.entries);
+
         console.log("got:", feed.entries);
-        
+
         if (currentItems) {
-            for (var i = 0; i < currentItems.length; i++) {
-                console.log("removing", feed.entries[feed.entries.length - 1]);
-                feed.entries.pop();    
+            var firstDate = parseDate(currentItems[0].publishedDate.substr(5, 20));
+            var lastDate = parseDate(currentItems[currentItems.length - 1].publishedDate.substr(5, 20));
+
+            var before = [],
+                after = [];
+
+            for (var i = 0; i < feed.entries.length; i++) {
+                var entry = feed.entries[i];
+
+                var date = parseDate(entry.publishedDate.substr(5, 20));
+                var cmp = compareDates(firstDate, date);
+
+                switch (cmp) {
+                    case 0: break;
+                    case 1: // firstDate is later, i.e entry is in the 'past'
+                        if (compareDates(lastDate, date) === 1)
+                            after.push(entry);
+                        break;
+                    case -1: // firstDate is earlier, i.e entry is a new post
+                        before.push(entry);
+                        break;
+                }
             }
+
+            renderBlogItems($("#new-items-node"), before);
+            renderBlogItems($("#cached-items-node"), after);
+        } else {
+            renderBlogItems($("#new-items-node"), feed.entries);
         }
-        
-        renderBlogItems($("#new-items-node"), feed.entries);
     });
 }
 
@@ -209,6 +239,10 @@ $(document).ready(function(){
         renderBlogItems($("#cached-items-node"), $.totalStorage('cached-blog'));
     }
 
-    //postFetchCount += 20;
-    // update();
+    update();
+
+     setTimeout(function () {
+        postFetchCount += 20;
+        update();
+    }, 5000)
 });
