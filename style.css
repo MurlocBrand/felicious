@@ -1,3 +1,6 @@
+/*
+ Copyright (c) 2014 handelsbolaget shai. All rights reserved.
+*/
 body {
     font-family: Arial, Helvetica, sans-serif;   
     background:#E0E0E0;
@@ -37,15 +40,14 @@ div {
 
 .header {
     font-family: FreebooterScript, Helvetica, Arial, sans-serif;
-
     text-align: center;
 
     color: #FF00FF;
-
-    background:#000;
-    padding:25px 0px 5px 0px;
+    background: #000;
+    height: 64px;
+    //padding: 25px 0px 0px 0px;
     
-    font-size:48px;
+    font-size: 48px;
 }
 
 .content {  

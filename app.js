@@ -1,17 +1,21 @@
+/**
+ * Copyright (c) 2014 handelsbolaget shai. All rights reserved.
+ */
+
 var fullText = [];
 var postId = 0;
-var postFetchCount = 20;
+var postFetchCount = 5;
+var canUpdate = true;
 
 /* Request a RSS feed via Google's Feed API. 
  * Feed API the RSS feed as a JSON object. 
  */
 function loadRSS(url, callback) {
     var gurl="http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&callback=?&q="+url+"&num=" + postFetchCount;
-    
+    canUpdate = false;
+
     $.getJSON(gurl, function(data) {
-        if (! data.responseData.feed) {
-            alert("Error - Could not retrieve new blog posts. Please check internet connection and try again!");
-        } else {
+        if (data.responseData.feed) {
             callback(data.responseData.feed)
         }
     });
@@ -92,6 +96,8 @@ function renderBlogItems (container, blog) {
 
         postId++;
     }
+
+    canUpdate = true;
 }
 
 /* Load new blog posts. This method should avoid
@@ -101,9 +107,11 @@ function update(){
     loadRSS("http://www.felicious.se/RSS/blog", function(feed){
         var currentItems = $.totalStorage('cached-blog');
         $.totalStorage('cached-blog', feed.entries);
+        console.log("got:", feed.entries);
         
         if (currentItems) {
             for (var i = 0; i < currentItems.length; i++) {
+                console.log("removing", feed.entries[feed.entries.length - 1]);
                 feed.entries.pop();    
             }
         }
@@ -113,10 +121,29 @@ function update(){
 }
 
 /* Render cached blog posts immediately, and fetch new ones. */
+$(window).scroll(function () {
+    var wintop = $(window).scrollTop();
+    var container = $("#container").height();
+    var docheight = $(window).height();
+
+    console.log(wintop, container, docheight, wintop / container);
+
+
+    var  scrolltrigger = 0.95;
+
+    /*if  ((wintop/(docheight-winheight)) > scrolltrigger && canUpdate) {
+        console.log("fetching new posts...: " + (wintop/(docheight-winheight)));
+        postFetchCount += 2;
+        update();
+    }*/
+});
+
 $(document).ready(function(){
+    //$.totalStorage.deleteItem('cached-blog');
+
     if ($.totalStorage('cached-blog')) {
         renderBlogItems($("#cached-items-node"), $.totalStorage('cached-blog'));
     }
-    
+    //postFetchCount += 20;
     update();
 });
