@@ -8,7 +8,7 @@ var fullText = [],
     canUpdate = true,
     inView = true,
     $window = $(window),
-    $scroller = $("#scroll");
+    $scroller;
 
 /* Test if scroll element is inside view or not. */
 function insideView() {
@@ -242,6 +242,7 @@ $(window).scroll(function () {
 
 /* Render cached blog posts immediately, and fetch new ones. */
 $(document).ready(function(){
+    $scroller = $("#scroll");
     if ($.totalStorage('cached-blog')) {
         renderBlogItems($("#cached-items-node"), $.totalStorage('cached-blog'));
     }
