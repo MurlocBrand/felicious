@@ -6,16 +6,31 @@ var fullText = [];
 var postId = 0;
 var postFetchCount = 5;
 var canUpdate = true;
+var inView = true;
 
 var DUMMY_CONTENT = [{"title":"Feedback","link":"http://www.felicious.se/2014/04/03/feedback-21204238","author":"","publishedDate":"Thu, 03 Apr 2014 14:33:13 -0700","contentSnippet":"Feedback från några av våra kunder!\n\n\"Att deras service är på hög nivå! Man känner sig välkommen till max!!\"\n16 mars ...","content":"<p>Feedback från några av våra kunder!<br>\n<br>\n\"Att deras service är på hög nivå! Man känner sig välkommen till max!!\"<br>\n16 mars 2014<br>\n<br>\n\"Annamari är duktig och klipper bra, lättskött frisyr\"<br>\n15 mars 2014<br>\n<br>\nTack - tror jag hittat min nya frisör - supernöjd! :)<br>\n20 mars 2014<br>\n<br>\n\"Felicia lyckades fånga rätt färg och en klippning som jag blev mycket nöjd med. Trots att jag inte hade klart för mig vad jag ville. Trolleri!!! Dessutom fick jag koppla av - utan en massa prat! \"<br>\n23 mars 2014<br>\n<br>\nVärt ett besök!<br>\n31 mars 2014<br>\n<br>\nTack snälla för alla fina ord! Jag och Annamari är glada och stolta att kunna göra våra kunder nöjda.<br>\n </p>\n<p><img src=\"http://h24-original.s3.amazonaws.com/45120/14777648-eRjSa.jpg?name=.jpg\" alt=\"\" width=\"866\" height=\"936\"></p>","categories":[]},{"title":"Vår på Felicious","link":"http://www.felicious.se/2014/03/31/v%C3%A5r-p%C3%A5-felicious-21154384","author":"","publishedDate":"Mon, 31 Mar 2014 13:13:41 -0700","contentSnippet":"Vilket h&auml;rligt v&auml;der vi haft och har framf&ouml;r oss! Det m&auml;rks att pulsen i centrum h&ouml;js! \nFelicious ...","content":"<p>Vilket härligt väder vi haft och har framför oss! Det märks att pulsen i centrum höjs! </p>\n<p>Felicious välkomnar gamla som nya kunder att klippa och färga för att liva upp det trötta vinter håret! Vi hjälper gärna till med nya förslag och förändring. </p>\n<p>Den 27 mars var Felicious med på Noa Noa&#39;s vår visning där vi ansvarade för hår uppsättningar/styling! Härlig kväll och mer kommer!</p>\n<p>Hoppas vi ses snart! Tänk på att boka tid lite i förväg då det är många som redan bokat tider! </p>\n<p></p>\n<p></p>\n<p></p>","categories":[]},{"title":"Jul på Felicious","link":"http://www.felicious.se/2013/11/29/jul-p%C3%A5-felicious-19455646","author":"","publishedDate":"Fri, 29 Nov 2013 11:27:20 -0800","contentSnippet":"Nu &auml;r julen kommen p&aring; Felicious! \nBoka tid redan i helgen f&ouml;r klipp / f&auml;rg behandling inf&ouml;r jul / ...","content":"<p>Nu är julen kommen på Felicious! </p>\n<p>Boka tid redan i helgen för klipp / färg behandling inför jul / nyår! </p>\n<p>Trevlig helg! </p>\n<p></p>","categories":[]},{"title":"Nyårs Uppsättning","link":"http://www.felicious.se/2013/11/21/ny%C3%A5rs-upps%C3%A4ttning-19351381","author":"","publishedDate":"Thu, 21 Nov 2013 03:46:10 -0800","contentSnippet":"Det börjar närma sig December och Julens månad.\n\nVi har en hel del härliga erbjudande med bra rabatter på produkter för både ...","content":"Det börjar närma sig December och Julens månad.<br>\n<br>\nVi har en hel del härliga erbjudande med bra rabatter på produkter för både kvinnor och män.<br>\n<br>\nVi har öppet även Nyårsafton för uppsättningar, pris 650 kr.<br>\n<br>\nFinns några tider kvar så passa på och ring in för att boka du med!<p><img src=\"http://h24-original.s3.amazonaws.com/45120/13502373-1SWR8.jpg?name=.jpg\" alt=\"\" width=\"960\" height=\"638\"></p>","categories":[]}];
 var DUMMY_ENTRY = {"title":"Ska du på bal i vår?","link":"http://www.felicious.se/2014/04/03/ska-du-p%C3%A5-bal-i-v%C3%A5r--21204461","author":"","publishedDate":"Thu, 03 Apr 2014 14:56:17 -0700","contentSnippet":"Felicious hjälper dig med uppsättning till balen så du kan känna dig avkopplad.\nVi har stor erfarenhet av både bal och ...","content":"<p>Felicious hjälper dig med uppsättning till balen så du kan känna dig avkopplad.<br>\nVi har stor erfarenhet av både bal och bröllopsuppsättningar.<br>\n<br>\nHär är bilder från senaste baluppsättningar som vi gjort.<br>\n<br>\nPris: 595 kr<br>\n </p>\n<p><img src=\"http://h24-original.s3.amazonaws.com/45120/14777743-UQsZF.jpg?name=.jpg\" alt=\"\" width=\"960\" height=\"960\"></p>","categories":[]};
+
+/* Test if element is inside view or not. */
+var $window = $(window);
+function insideView(e) {
+   var docViewTop = $window.scrollTop(),
+       docViewBottom = docViewTop + window.innerHeight,
+       elemTop = e.offset().top,
+       elemBottom = elemTop + e.height();
+
+       console.log("eTop", elemTop, "eBot", elemBottom);
+       console.log("dTop", docViewTop, "dBot", docViewBottom);
+
+   return ((elemBottom >= docViewTop) && (elemTop <= docViewBottom)
+             && (elemBottom <= docViewBottom) &&  (elemTop >= docViewTop) );
+}
 
 /* Request a RSS feed via Google's Feed API. 
  * Feed API the RSS feed as a JSON object. 
  */
 function loadRSS(url, callback) {
     var gurl="http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&callback=?&q="+url+"&num=" + postFetchCount;
-    canUpdate = false;
 
     $.getJSON(gurl, function(data) {
         if (data.responseData.feed) {
@@ -166,13 +181,18 @@ function renderBlogItems (container, blog) {
         postId++;
     }
 
-    canUpdate = true;
+    inView = insideView($("#scroll"))
 }
 
-/* Load new blog posts. This method should avoid
- * adding already existing blog posts, not 100% sure.
+/* Load new blog posts. This method only adds blog entries
+ * that is outside the current time range. 
+ * 
+ * num is the amount of new entries to try and get
  */
-function update(){
+function update(num){
+    canUpdate = false;
+    if (num) postFetchCount += num;
+
     loadRSS("http://www.felicious.se/RSS/blog", function(feed){
         var currentItems = $.totalStorage('cached-blog');
         $.totalStorage('cached-blog', feed.entries);
@@ -180,6 +200,7 @@ function update(){
         console.log("got:", feed.entries);
 
         if (currentItems) {
+            // pre-parse dates, only add blog entries if date is outside this range
             var firstDate = parseDate(currentItems[0].publishedDate.substr(5, 20));
             var lastDate = parseDate(currentItems[currentItems.length - 1].publishedDate.substr(5, 20));
 
@@ -193,7 +214,7 @@ function update(){
                 var cmp = compareDates(firstDate, date);
 
                 switch (cmp) {
-                    case 0: break;
+                    case 0: break; // same date
                     case 1: // firstDate is later, i.e entry is in the 'past'
                         if (compareDates(lastDate, date) === 1)
                             after.push(entry);
@@ -209,40 +230,40 @@ function update(){
         } else {
             renderBlogItems($("#new-items-node"), feed.entries);
         }
+
+        canUpdate = true;
     });
 }
 
-/* Render cached blog posts immediately, and fetch new ones. */
+
+
+
 $(window).scroll(function () {
-    var wintop = $(window).scrollTop();
-    var container = $("#container").height();
-    var docheight = $(window).height();
+    if (canUpdate) {
+        var res = insideView($("#scroll"));
+        console.log(res);
 
-    console.log(wintop, container, docheight, wintop / container);
-
-
-    var  scrolltrigger = 0.95;
-
-    /*if  ((wintop/(docheight-winheight)) > scrolltrigger && canUpdate) {
-        console.log("fetching new posts...: " + (wintop/(docheight-winheight)));
-        postFetchCount += 2;
-        update();
-    }*/
+        if (res && !inView) {
+            update(5);
+            inView = true;
+            console.log("infinity-scroll-update");
+        } else if (inView && !res) {
+            inView = false;
+        } else {
+            console.log("inView", inView);
+        }
+    }
 });
 
+/* Render cached blog posts immediately, and fetch new ones. */
 $(document).ready(function(){
     $.totalStorage.deleteItem('cached-blog');
-
     $.totalStorage('cached-blog', DUMMY_CONTENT);
 
+    inView = false;
     if ($.totalStorage('cached-blog')) {
         renderBlogItems($("#cached-items-node"), $.totalStorage('cached-blog'));
     }
 
     update();
-
-     setTimeout(function () {
-        postFetchCount += 20;
-        update();
-    }, 5000)
 });
