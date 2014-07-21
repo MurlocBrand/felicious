@@ -66,14 +66,15 @@ div {
 
 .card h1 {
     margin:0px;
+    font-size: 2em;
     padding:10px;
-    padding-bottom:0px;
 }
 
 .card p {
     margin:0px;
     padding:10px;
     display: block;
+    font-family: "Helvetica";
 }
 
 .card-image {
