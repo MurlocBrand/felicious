@@ -193,7 +193,7 @@ function update(num){
     loadRSS("http://www.felicious.se/RSS/blog", function(feed){
         $.totalStorage('cached-blog', feed.entries);
 
-        if (currentItems) {
+        if (currentItems.length > 0) {
             // pre-parse dates, only add blog entries if date is outside this range
             var firstDate = parseDate(currentItems[0].publishedDate.substr(5, 20));
             var lastDate = parseDate(currentItems[currentItems.length - 1].publishedDate.substr(5, 20));
