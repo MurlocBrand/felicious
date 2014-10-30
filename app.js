@@ -22,38 +22,20 @@ function insideView() {
              && (elemBottom <= docViewBottom) &&  (elemTop >= docViewTop) );
 }
 
-/* Request a RSS feed via Google's Feed API. 
- * Feed API the RSS feed as a JSON object. 
+/* Request a RSS feed via Google's Feed API.
+ * Feed API the RSS feed as a JSON object.
  */
 function loadRSS(url, callback) {
-    var gurl="http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&callback=?&q="+url+"&num=" + postFetchCount;
+    var gurl="httpx://ajax.googleapis.com/ajax/services/feed/load?v=1.0&callback=?&q="+url+"&num=" + postFetchCount;
 
     $.getJSON(gurl, function(data) {
         if (data.responseData.feed) {
             callback(data.responseData.feed)
         }
-    });
-}
-
-/* Return {3|4|2014|14|33|13} from "03 Apr 2014 14:33:13" */
-function parseDate(value) {
-    var months = {
-        "Jan" : 1,  "Feb" : 2,  "Mar" : 3,
-        "Apr" : 4,  "May" : 5,  "Jun" : 6,
-        "Jul" : 7,  "Aug" : 8,  "Sep" : 9,
-        "Oct" : 10, "Nov" : 11, "Dec" : 12 
-    }
-
-    // parse float to remove preceeding 0
-    return {
-        "day" : parseFloat(value.substr(0, 2)),
-        "month" : months[value.substr(3, 3)],
-        "year" : value.substr(7, 4),
-
-        "hour" : parseFloat(value.substr(12, 2)),
-        "min" : parseFloat(value.substr(15, 2)),
-        "sec" : parseFloat(value.substr(18, 2))
-    }
+    })
+    .fail(function() {
+        alert("Sorry, couldn't fetch news feed. Please check your network connection and try again.");
+    })
 }
 
 /* Compare two dates and return 0, 1 or -1 depending on their
@@ -61,29 +43,24 @@ function parseDate(value) {
  */
 function compareDates(date1, date2) {
     if (typeof date1 == "string")
-        date1 = parseDate(date1.substr(5, 20));
+        date1 = Date.parse(date1)
 
     if (typeof date2 == "string")
-        date2 = parseDate(date2.substr(5, 20));
+        date2 = Date.parse(date2)
 
     // compare amount of seconds that differ the two times
-    var time1 = date1.sec + date1.min * 60 + date1.hour * 3600
-                + date1.day * 24 * 3600 + date1.month * 30.5 * 24 * 3600
-                + date1.year * 12 * 30.5 * 24 * 3600;
+    var diff = date1 - date2
 
-     var time2 = date2.sec + date2.min * 60 + date2.hour * 3600
-                + date2.day * 24 * 3600 + date2.month * 30.5 * 24 * 3600
-                + date2.year * 12 * 30.5 * 24 * 3600;
-
-    var diff = time1 - time2;
-
-    if (diff < 0) return -1;
-    else if (diff > 0) return 1;
-    else return 0;
+    if (diff < 0)
+        return -1
+    else if (diff > 0)
+        return 1
+    else
+        return 0
 }
 
-/* Show full text of a given post. 
- * Only IDs belonging to a post with a snippet can be used. 
+/* Show full text of a given post.
+ * Only IDs belonging to a post with a snippet can be used.
  */
 function showText(id){
     $("#text-" + id).html(fullText[id]);
@@ -98,10 +75,10 @@ function createImage(data) {
     // remove the preceding src=", and the last "
     imgSrc = imgSrc.substr(5, imgSrc.length-6)
 
-    var image = $("<div>").addClass("card-image");
-    image.css("background-image", "url('" + imgSrc + "')");
+    var image = $("<img>");
+    image.attr("src", imgSrc);
 
-    return image;
+    return $("<div>").addClass('card-image').append(image);
 }
 
 /* Create and return the DOM element that represents
@@ -121,7 +98,7 @@ function createContent(txt, id) {
         .attr("id", "text-" + id);
 }
 
-/* Create a semi-transparant texture overlay that is 
+/* Create a semi-transparant texture overlay that is
  * clickable, and upon click will call showText(<id>)
  */
 function createOverlay(id){
@@ -143,7 +120,7 @@ function createOverlay(id){
 }
 
 /* Append a number of blog posts (items) to a given
- * jquery document node. 
+ * jquery document node.
  */
 function renderBlogItems (container, blog) {
     for (var i = 0; i < blog.length; i++) {
@@ -162,10 +139,10 @@ function renderBlogItems (container, blog) {
 
         if (data[1])
             card.append(createImage(data[1]));
-        
+
         body.append(content);
         card.append(body);
-        
+
         // If we have a short version (snippet) of the full text, use it!
         if (entry.contentSnippet) {
             fullText[postId] = data[0];
@@ -182,8 +159,8 @@ function renderBlogItems (container, blog) {
 }
 
 /* Load new blog posts. This method only adds blog entries
- * that is outside the current time range. 
- * 
+ * that is outside the current time range.
+ *
  * num is the amount of new entries to try and get
  */
 function update(num){
@@ -195,8 +172,8 @@ function update(num){
 
         if (currentItems.length > 0) {
             // pre-parse dates, only add blog entries if date is outside this range
-            var firstDate = parseDate(currentItems[0].publishedDate.substr(5, 20));
-            var lastDate = parseDate(currentItems[currentItems.length - 1].publishedDate.substr(5, 20));
+            var firstDate = Date.parse(currentItems[0].publishedDate.substr(5, 20));
+            var lastDate = Date.parse(currentItems[currentItems.length - 1].publishedDate.substr(5, 20));
 
             var before = [],
                 after = [];
@@ -204,7 +181,7 @@ function update(num){
             for (var i = 0; i < feed.entries.length; i++) {
                 var entry = feed.entries[i];
 
-                var date = parseDate(entry.publishedDate.substr(5, 20));
+                var date = Date.parse(entry.publishedDate.substr(5, 20));
                 var cmp = compareDates(firstDate, date);
 
                 switch (cmp) {
@@ -233,7 +210,7 @@ function update(num){
 $(window).scroll(function () {
     if (canUpdate) {
         var res = insideView();
-     
+
         if (res && !inView)
             update(5);
 
