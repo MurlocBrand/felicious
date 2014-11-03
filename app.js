@@ -34,7 +34,14 @@ function loadRSS(url, callback) {
         }
     })
     .fail(function() {
-        alert("Sorry, couldn't fetch news feed. Please check your network connection and try again.");
+        var message = "Sorry, couldn't fetch news feed. Please check your network connection and try again."
+
+        var iframe = document.createElement("IFRAME");
+        iframe.setAttribute("src", 'data:text/plain,');
+        document.documentElement.appendChild(iframe);
+        window.frames[0].window.alert(message);
+        iframe.parentNode.removeChild(iframe);
+
     })
 }
 
@@ -48,7 +55,7 @@ function compareDates(date1, date2) {
     if (typeof date2 == "string")
         date2 = Date.parse(date2)
 
-    // compare amount of seconds that differ the two times
+    // compare amount of milliseconds that differ the two times
     var diff = date1 - date2
 
     if (diff < 0)
