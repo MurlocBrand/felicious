@@ -19,7 +19,7 @@ Included work are copyrighted by their respective authors.
 
 license / legal
 ===============
-handelsbolag shai retains all rights to the Software.
+handelsbolaget shai retains all rights to the Software.
 
 handelsbolaget shai has granted felicious AB the right to modify the Software and distribute binaries on Apple Inc:s App Store(tm).
 
