@@ -4,7 +4,7 @@ This is a WebView-powered website, running on iOS. It fetches and displays an RS
 
 future updates
 ==============
-- infinite scroll
+- multiple images
 - button that indicates new posts if user has scrolled down the list when fetch completes
 
 acknowledgements
